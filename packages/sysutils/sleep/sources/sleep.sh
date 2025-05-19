@@ -122,6 +122,7 @@ case $1 in
     touch /run/.last_sleep_time
   ;;
   post)
+    quirks post
     ledcontrol
     modules start
     powerstate start
@@ -143,6 +144,5 @@ case $1 in
     BRIGHTNESS=$(get_setting display.brightness)
     log $0 "Restoring brightness to ${BRIGHTNESS}."
     brightness set ${BRIGHTNESS} >${EVENTLOG} 2>&1
-    quirks post
   ;;
 esac
