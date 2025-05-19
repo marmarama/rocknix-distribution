@@ -178,6 +178,6 @@ fi
   export LD_LIBRARY_PATH=/usr/share/aethersx2-sa/libs
 
 #Run Aethersx2 emulator
-  export SDL_AUDIODRIVER=pulseaudio
+  export SDL_AUDIODRIVER=pipewire
   set_kill set "-9 aethersx2"
   ${EMUPERF} /usr/share/aethersx2-sa/aethersx2 -bigpicture -fullscreen "${1}"

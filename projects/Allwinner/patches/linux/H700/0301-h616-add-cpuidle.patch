@@ -1,0 +1,212 @@
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616-cpu-opp.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616-cpu-opp.dtsi
+index dd10aaf472b6..70956cf166b3 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616-cpu-opp.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616-cpu-opp.dtsi
+@@ -12,6 +12,7 @@ opp-480000000 {
+ 			opp-microvolt = <900000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+ 			opp-supported-hw = <0x3f>;
++			opp-suspend;
+ 		};
+ 
+ 		opp-600000000 {
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index cdce3dcb8ec0..8d75a8853ae6 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -20,6 +20,23 @@ cpus {
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+ 
++		cpu-map {
++			cluster0 {
++				core0 {
++					cpu = <&cpu0>;
++				};
++				core1 {
++					cpu = <&cpu1>;
++				};
++				core2 {
++					cpu = <&cpu2>;
++				};
++				core3 {
++					cpu = <&cpu3>;
++				};
++			};
++		};
++
+ 		cpu0: cpu@0 {
+ 			compatible = "arm,cortex-a53";
+ 			device_type = "cpu";
+@@ -27,12 +44,14 @@ cpu0: cpu@0 {
+ 			enable-method = "psci";
+ 			clocks = <&ccu CLK_CPUX>;
+ 			#cooling-cells = <2>;
+-			i-cache-size = <0x8000>;
++			dynamic-power-coefficient = <100>;
++			i-cache-size = <32768>;
+ 			i-cache-line-size = <64>;
+ 			i-cache-sets = <256>;
+-			d-cache-size = <0x8000>;
++			d-cache-size = <32768>;
+ 			d-cache-line-size = <64>;
+ 			d-cache-sets = <128>;
++			cpu-idle-states = <&CPU_SLEEP>;
+ 			next-level-cache = <&l2_cache>;
+ 		};
+ 
+@@ -43,12 +62,14 @@ cpu1: cpu@1 {
+ 			enable-method = "psci";
+ 			clocks = <&ccu CLK_CPUX>;
+ 			#cooling-cells = <2>;
+-			i-cache-size = <0x8000>;
++			dynamic-power-coefficient = <100>;
++			i-cache-size = <32768>;
+ 			i-cache-line-size = <64>;
+ 			i-cache-sets = <256>;
+-			d-cache-size = <0x8000>;
++			d-cache-size = <32768>;
+ 			d-cache-line-size = <64>;
+ 			d-cache-sets = <128>;
++			cpu-idle-states = <&CPU_SLEEP>;
+ 			next-level-cache = <&l2_cache>;
+ 		};
+ 
+@@ -59,12 +80,14 @@ cpu2: cpu@2 {
+ 			enable-method = "psci";
+ 			clocks = <&ccu CLK_CPUX>;
+ 			#cooling-cells = <2>;
+-			i-cache-size = <0x8000>;
++			dynamic-power-coefficient = <100>;
++			i-cache-size = <32768>;
+ 			i-cache-line-size = <64>;
+ 			i-cache-sets = <256>;
+-			d-cache-size = <0x8000>;
++			d-cache-size = <32768>;
+ 			d-cache-line-size = <64>;
+ 			d-cache-sets = <128>;
++			cpu-idle-states = <&CPU_SLEEP>;
+ 			next-level-cache = <&l2_cache>;
+ 		};
+ 
+@@ -75,12 +98,14 @@ cpu3: cpu@3 {
+ 			enable-method = "psci";
+ 			clocks = <&ccu CLK_CPUX>;
+ 			#cooling-cells = <2>;
+-			i-cache-size = <0x8000>;
++			dynamic-power-coefficient = <100>;
++			i-cache-size = <32768>;
+ 			i-cache-line-size = <64>;
+ 			i-cache-sets = <256>;
+-			d-cache-size = <0x8000>;
++			d-cache-size = <32768>;
+ 			d-cache-line-size = <64>;
+ 			d-cache-sets = <128>;
++			cpu-idle-states = <&CPU_SLEEP>;
+ 			next-level-cache = <&l2_cache>;
+ 		};
+ 
+@@ -88,10 +113,22 @@ l2_cache: l2-cache {
+ 			compatible = "cache";
+ 			cache-level = <2>;
+ 			cache-unified;
+-			cache-size = <0x40000>;
++			cache-size = <262144>;
+ 			cache-line-size = <64>;
+ 			cache-sets = <256>;
+ 		};
++
++		idle-states {
++			entry-method = "psci";
++			CPU_SLEEP: cpu-sleep {
++				compatible = "arm,idle-state";
++				local-timer-stop;
++				arm,psci-suspend-param = <0x10000>;
++				entry-latency-us = <46>;
++				exit-latency-us = <59>;
++				min-residency-us = <3570>;
++			};
++		};
+ 	};
+ 
+ 	reserved-memory {
+@@ -127,7 +164,7 @@ pmu {
+ 	};
+ 
+ 	psci {
+-		compatible = "arm,psci-0.2";
++		compatible = "arm,psci-1.0";
+ 		method = "smc";
+ 	};
+ 
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+index 7e17ca07892d..a5f4c0b30e90 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+@@ -252,6 +252,7 @@ reg_dcdc1: dcdc1 {
+ 				regulator-min-microvolt = <900000>;
+ 				regulator-max-microvolt = <1160000>;
+ 				regulator-name = "vdd-cpu";
++				regulator-enable-ramp-delay = <1000>;
+ 			};
+ 
+ 			reg_dcdc2: dcdc2 {
+@@ -259,6 +260,7 @@ reg_dcdc2: dcdc2 {
+ 				regulator-min-microvolt = <940000>;
+ 				regulator-max-microvolt = <940000>;
+ 				regulator-name = "vdd-gpu-sys";
++				regulator-enable-ramp-delay = <1000>;
+ 			};
+ 
+ 			reg_dcdc3: dcdc3 {
+@@ -266,6 +268,7 @@ reg_dcdc3: dcdc3 {
+ 				regulator-min-microvolt = <1100000>;
+ 				regulator-max-microvolt = <1100000>;
+ 				regulator-name = "vdd-dram";
++				regulator-enable-ramp-delay = <1000>;
+ 			};
+ 
+ 			reg_aldo1: aldo1 {
+@@ -281,9 +284,11 @@ reg_aldo3: aldo3 {
+ 			};
+ 
+ 			reg_aldo4: aldo4 {
++				/* audio codec */
+ 				regulator-min-microvolt = <1800000>;
+ 				regulator-max-microvolt = <1800000>;
+ 				regulator-name = "avcc";
++				regulator-enable-ramp-delay = <1000>;
+ 			};
+ 
+ 			reg_bldo1: bldo1 {
+@@ -295,6 +300,7 @@ reg_bldo2: bldo2 {
+ 				regulator-min-microvolt = <1800000>;
+ 				regulator-max-microvolt = <1800000>;
+ 				regulator-name = "vcc-pll";
++				regulator-enable-ramp-delay = <1000>;
+ 			};
+ 
+ 			reg_bldo3: bldo3 {
+@@ -310,6 +316,7 @@ reg_cldo1: cldo1 {
+ 				regulator-min-microvolt = <3300000>;
+ 				regulator-max-microvolt = <3300000>;
+ 				regulator-name = "vcc-spkr-amp";
++				regulator-enable-ramp-delay = <1000>;
+ 			};
+ 
+ 			reg_cldo2: cldo2 {
+@@ -321,12 +328,14 @@ reg_cldo3: cldo3 {
+ 				regulator-min-microvolt = <3300000>;
+ 				regulator-max-microvolt = <3300000>;
+ 				regulator-name = "vcc-io";
++				regulator-enable-ramp-delay = <1000>;
+ 			};
+ 
+ 			reg_cldo4: cldo4 {
+ 				regulator-min-microvolt = <3300000>;
+ 				regulator-max-microvolt = <3300000>;
+ 				regulator-name = "vcc-wifi";
++				regulator-enable-ramp-delay = <1000>;
+ 			};
+ 
+ 			reg_boost: boost {

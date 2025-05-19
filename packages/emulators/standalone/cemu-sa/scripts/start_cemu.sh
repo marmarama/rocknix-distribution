@@ -7,7 +7,7 @@
 . /etc/profile
 
 # Ensure we're using pulseaudio
-export SDL_AUDIODRIVER=pulseaudio
+export SDL_AUDIODRIVER=pipewire
 set_kill set "-9 cemu"
 
 if [ -z "${PASINK}" ]
