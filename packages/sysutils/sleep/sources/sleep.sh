@@ -88,6 +88,18 @@ modules() {
   esac
 }
 
+persist_journal() {
+  log $0 "Persist journal: ${1}"
+  case ${1} in
+    stop)
+      journalctl --relinquish-var
+    ;;
+    start)
+      journalctl --flush
+    ;;
+  esac
+}
+
 quirks() {
   for QUIRK in /usr/lib/autostart/quirks/platforms/"${HW_DEVICE}"/sleep.d/${1}/* \
                /usr/lib/autostart/quirks/devices/"${QUIRK_DEVICE}"/sleep.d/${1}/*
@@ -98,6 +110,7 @@ quirks() {
 
 case $1 in
   pre)
+    persist_journal stop
     headphones stop
     inputsense stop
     bluetooth stop
@@ -115,6 +128,7 @@ case $1 in
     headphones start
     inputsense start
     bluetooth start
+    persist_journal start
 
     if [ "$(get_setting wifi.enabled)" == "1" ]
     then
